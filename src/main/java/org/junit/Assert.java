@@ -264,7 +264,12 @@ public class Assert {
     static public void assertNotEquals(float unexpected, float actual, float delta) {
         assertNotEquals(null, unexpected, actual, delta);
     }
-
+    
+    public static <T> void assertGraterThan(T o1, T o2, java.util.Comparator<T> comparator) {
+        if(comparator.compare(o1, o2) > 0)
+            return;
+        fail();
+    }
     /**
      * Asserts that two object arrays are equal. If they are not, an
      * {@link AssertionError} is thrown with the given message. If
