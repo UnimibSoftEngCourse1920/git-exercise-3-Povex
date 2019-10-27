@@ -669,6 +669,17 @@ public class Assert {
         fail("Use assertEquals(expected, actual, delta) to compare floating-point numbers");
     }
 
+    public static void assertGreaterThan(int o1, int o2) {
+        if(o1 - o2 > 0)
+            return;
+        fail();
+    }
+    
+    public static void assertGreaterThan(boolean o1, boolean o2) {
+        if(o1 && !o2)
+            return;
+        fail();
+    }
     /**
      * Asserts that two doubles are equal to within a positive delta.
      * If they are not, an {@link AssertionError} is thrown. If the expected

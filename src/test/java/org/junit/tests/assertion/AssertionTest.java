@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertGreaterThan;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -411,6 +412,12 @@ public class AssertionTest {
         assertEquals(1.0d, 1.0d, 0.0d);
     }
 
+    @Test
+    public void greaterThan() {
+        assertGreaterThan(2, 1);
+        assertGreaterThan(true, false);
+    }
+    
     @Test(expected = AssertionError.class)
     public void notEqualsObjectWithNull() {
         assertEquals(new Object(), null);
