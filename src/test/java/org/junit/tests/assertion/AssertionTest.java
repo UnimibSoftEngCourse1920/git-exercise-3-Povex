@@ -5,20 +5,24 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertGreaterThan;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Comparator;
 
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 import org.junit.internal.ArrayComparisonFailure;
 
 /**
@@ -32,6 +36,8 @@ public class AssertionTest {
 //      assert false;
 //  }
 
+    private static final String ASSERTION_ERROR_EXPECTED = "AssertionError expected";
+
     @Test(expected = AssertionError.class)
     public void fails() {
         Assert.fail();
@@ -43,7 +49,9 @@ public class AssertionTest {
             Assert.fail();
         } catch (AssertionError exception) {
             assertEquals("java.lang.AssertionError", exception.toString());
+            return;
         }
+        throw new AssertionError(ASSERTION_ERROR_EXPECTED);
     }
 
     @Test
@@ -52,35 +60,66 @@ public class AssertionTest {
             Assert.fail("woops!");
         } catch (AssertionError exception) {
             assertEquals("java.lang.AssertionError: woops!", exception.toString());
+            return;
         }
+        throw new AssertionError(ASSERTION_ERROR_EXPECTED);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void arraysNotEqual() {
-        assertArrayEquals((new Object[]{new Object()}), (new Object[]{new Object()}));
+        assertArrayEqualsFailure(
+                new Object[]{"right"},
+                new Object[]{"wrong"},
+                "arrays first differed at element [0]; expected:<[right]> but was:<[wrong]>");
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void arraysNotEqualWithMessage() {
-        assertArrayEquals("not equal", (new Object[]{new Object()}), (new Object[]{new Object()}));
+        assertArrayEqualsFailure(
+                "not equal",
+                new Object[]{"right"},
+                new Object[]{"wrong"},
+                "not equal: arrays first differed at element [0]; expected:<[right]> but was:<[wrong]>");
     }
 
     @Test
     public void arraysExpectedNullMessage() {
         try {
-            assertArrayEquals("not equal", null, (new Object[]{new Object()}));
+            assertArrayEquals("not equal", null, new Object[]{new Object()});
         } catch (AssertionError exception) {
             assertEquals("not equal: expected array was null", exception.getMessage());
+            return;
         }
+        throw new AssertionError(ASSERTION_ERROR_EXPECTED);
     }
 
     @Test
     public void arraysActualNullMessage() {
         try {
-            assertArrayEquals("not equal", (new Object[]{new Object()}), null);
+            assertArrayEquals("not equal", new Object[]{new Object()}, null);
         } catch (AssertionError exception) {
             assertEquals("not equal: actual array was null", exception.getMessage());
+            return;
         }
+        throw new AssertionError(ASSERTION_ERROR_EXPECTED);
+    }
+
+    @Test
+    public void arraysDifferentLengthDifferingAtStartMessage() {
+        assertArrayEqualsFailure(
+                "not equal",
+                new Object[]{true},
+                new Object[]{false, true},
+                "not equal: array lengths differed, expected.length=1 actual.length=2; arrays first differed at element [0]; expected:<true> but was:<false>");
+    }
+
+    @Test
+    public void arraysDifferentLengthDifferingAtEndMessage() {
+        assertArrayEqualsFailure(
+                "not equal",
+                new Object[]{true},
+                new Object[]{true, false},
+                "not equal: array lengths differed, expected.length=1 actual.length=2; arrays first differed at element [1]; expected:<end of array> but was:<false>");
     }
 
     @Test
